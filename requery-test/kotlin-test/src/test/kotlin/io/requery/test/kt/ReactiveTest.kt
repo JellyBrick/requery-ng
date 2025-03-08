@@ -23,11 +23,10 @@ import io.requery.sql.KotlinEntityDataStore
 import io.requery.sql.SchemaModifier
 import io.requery.sql.TableCreationMode
 import org.h2.jdbcx.JdbcDataSource
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.sql.SQLException
-import kotlin.properties.Delegates
 
 class ReactiveTest {
 
@@ -38,7 +37,7 @@ class ReactiveTest {
         return FunctionalTest.randomPerson()
     }
 
-    @Before
+    @BeforeEach
     @Throws(SQLException::class)
     fun setup() {
         val model = Models.KT
@@ -59,7 +58,7 @@ class ReactiveTest {
         tables.createTables(mode)
     }
 
-    @After
+    @AfterEach
     fun teardown() {
         data.close()
     }
@@ -70,7 +69,7 @@ class ReactiveTest {
         val personId = instance.insert(person).id
 
         data.select(Person::class)
-                .where(Person::id.eq(personId))
+                .where(Person::id.eq<Person, Int>(personId))
                 .get()
                 .maybe()
                 .test()
@@ -88,7 +87,7 @@ class ReactiveTest {
                 .assertComplete()
 
         data.select(Person::class)
-                .where(Person::id.eq(person.id))
+                .where(Person::id.eq<Person, Int>(person.id))
                 .get()
                 .maybe()
                 .test()
@@ -110,7 +109,7 @@ class ReactiveTest {
                 .assertComplete()
 
         data.select(Person::class)
-                .where(Person::id.eq(person.id))
+                .where(Person::id.eq<Person, Int>(person.id))
                 .get()
                 .maybe()
                 .test()

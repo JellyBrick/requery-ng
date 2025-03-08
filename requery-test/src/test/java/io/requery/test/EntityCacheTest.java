@@ -6,13 +6,14 @@ import io.requery.test.model.Address;
 import io.requery.test.model.AddressType;
 import io.requery.test.model.Models;
 import io.requery.test.model.Person;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.cache.CacheManager;
 import javax.cache.Caching;
 import javax.cache.spi.CachingProvider;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EntityCacheTest {
 
@@ -37,9 +38,9 @@ public class EntityCacheTest {
         cache.put(Person.class, id, p);
 
         Person d = cache.get(Person.class, id);
-        Assert.assertNotNull(d);
-        Assert.assertNotSame(p, d);
-        Assert.assertEquals(p.getName(), d.getName());
-        Assert.assertEquals(p.getUUID(), d.getUUID());
+        assertNotNull(d);
+        assertNotSame(p, d);
+        assertEquals(p.getName(), d.getName());
+        assertEquals(p.getUUID(), d.getUUID());
     }
 }

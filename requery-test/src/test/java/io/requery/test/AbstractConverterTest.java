@@ -1,11 +1,14 @@
 package io.requery.test;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import io.requery.Converter;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 /**
@@ -41,7 +44,7 @@ public abstract class AbstractConverterTest<T extends Converter<FROM, TO>, FROM,
         for (Map.Entry<FROM, TO> entry : getTestCases().entrySet()) {
             testCases.put(entry.getValue(), entry.getKey());
         }
-        org.junit.Assert.assertTrue("Test cases map does not have unique values!", testCases.size() == getTestCases().size());
+        assertTrue(() -> testCases.size() == getTestCases().size(), "Test cases map does not have unique values!");
         for (TO from : testCases.keySet()) {
             FROM expectedConvertedValue = testCases.get(from);
             FROM convertedValue = getConverter().convertToMapped(getType(), from);
@@ -53,7 +56,7 @@ public abstract class AbstractConverterTest<T extends Converter<FROM, TO>, FROM,
     protected abstract Class<? extends FROM> getType();
 
     protected void assertEquals(Object obj1, Object obj2) {
-        org.junit.Assert.assertEquals(obj1, obj2);
+        Assertions.assertEquals(obj1, obj2);
     }
 
 }

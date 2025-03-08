@@ -41,10 +41,9 @@ import io.requery.sql.TableCreationMode;
 import io.requery.sql.platform.HSQL;
 import io.requery.test.model.Person;
 import io.requery.test.model.Phone;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
@@ -61,16 +60,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReactiveTest extends RandomData {
 
     protected ReactiveEntityStore<Persistable> data;
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException {
         Platform platform = new HSQL();
         CommonDataSource dataSource = DatabaseType.getDataSource(platform);
@@ -93,7 +89,7 @@ public class ReactiveTest extends RandomData {
         data = ReactiveSupport.toReactiveStore(new EntityDataStore<Persistable>(configuration));
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         if (data != null) {
             data.close();
@@ -169,12 +165,12 @@ public class ReactiveTest extends RandomData {
                 .subscribe(new Consumer<Person>() {
             @Override
             public void accept(Person person) throws Exception {
-                Assert.fail();
+                fail();
             }
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) throws Exception {
-                Assert.fail();
+                fail();
             }
         }, new Action() {
             @Override
@@ -183,7 +179,7 @@ public class ReactiveTest extends RandomData {
             }
         });
         if (!latch.await(1, TimeUnit.SECONDS)) {
-            Assert.fail();
+            fail();
         }
     }
 

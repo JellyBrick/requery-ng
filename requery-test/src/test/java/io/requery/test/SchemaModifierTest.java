@@ -23,46 +23,44 @@ import io.requery.sql.Platform;
 import io.requery.sql.SchemaModifier;
 import io.requery.sql.TableCreationMode;
 import io.requery.sql.platform.Derby;
+import io.requery.sql.platform.Generic;
 import io.requery.sql.platform.H2;
 import io.requery.sql.platform.HSQL;
 import io.requery.test.model.Person;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import javax.sql.CommonDataSource;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
-@RunWith(Parameterized.class)
-public class SchemaModifierTest extends RandomData {
+class SchemaModifierTest extends RandomData {
 
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Platform> data() {
-        return Arrays.<Platform>asList(new H2(), new HSQL(), new Derby());
+    static Stream<Generic> data() {
+        return Stream.of(new H2(), new HSQL(), new Derby());
     }
 
     private Platform platform;
-
-    public SchemaModifierTest(Platform platform) {
-        this.platform = platform;
-    }
     private SchemaModifier schemaModifier;
 
-    @Before
-    public void setup() throws SQLException {
+    SchemaModifierTest(Platform platform) {
+        this.platform = platform;
+    }
+
+    @BeforeEach
+    void setup() throws SQLException {
         CommonDataSource dataSource = DatabaseType.getDataSource(platform);
         EntityModel model = io.requery.test.model.Models.DEFAULT;
 
         Configuration configuration = new ConfigurationBuilder(dataSource, model)
-            .useDefaultLogging()
-            .setStatementCacheSize(10)
-            .setBatchUpdateSize(50)
-            .setWriteExecutor(Executors.newSingleThreadExecutor())
-            .build();
+                .useDefaultLogging()
+                .setStatementCacheSize(10)
+                .setBatchUpdateSize(50)
+                .setWriteExecutor(Executors.newSingleThreadExecutor())
+                .build();
 
         schemaModifier = new SchemaModifier(configuration);
         try {
@@ -76,14 +74,20 @@ public class SchemaModifierTest extends RandomData {
         schemaModifier.createTables(TableCreationMode.CREATE);
     }
 
-    @Test
-    public void testAddRemoveColumn() throws Exception {
+    @ParameterizedTest
+    @MethodSource("data")
+    void testAddRemoveColumn(Platform platform) throws Exception {
+        this.platform = platform;
+        setup();
         schemaModifier.dropColumn(Person.AGE);
         schemaModifier.addColumn(Person.AGE);
     }
 
-    @Test
-    public void testAddRemoveForeignKeyColumn() throws Exception {
+    @ParameterizedTest
+    @MethodSource("data")
+    void testAddRemoveForeignKeyColumn(Platform platform) throws Exception {
+        this.platform = platform;
+        setup();
         schemaModifier.dropColumn(Person.ADDRESS);
         schemaModifier.addColumn(Person.ADDRESS);
     }

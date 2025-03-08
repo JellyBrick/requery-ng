@@ -34,9 +34,9 @@ import io.requery.test.jpa.Models;
 import io.requery.test.jpa.Person;
 import io.requery.test.jpa.PersonEntity;
 import io.requery.test.jpa.PhoneEntity;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.cache.CacheManager;
 import javax.cache.Caching;
@@ -53,10 +53,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JPAModelTest {
 
@@ -83,7 +83,7 @@ public class JPAModelTest {
         return person;
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException {
         CommonDataSource dataSource = DatabaseType.getDataSource(new H2());
         EntityModel model = Models.JPA;
@@ -106,7 +106,7 @@ public class JPAModelTest {
         tables.createTables(mode);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         if (data != null) {
             data.close();

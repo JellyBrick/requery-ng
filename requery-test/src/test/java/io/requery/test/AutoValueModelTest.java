@@ -32,9 +32,9 @@ import io.requery.test.autovalue.PersonType;
 import io.requery.test.autovalue.Phone;
 import io.requery.test.autovalue.PhoneType;
 import io.requery.util.function.Consumer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.sql.CommonDataSource;
 import java.net.MalformedURLException;
@@ -48,11 +48,11 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AutoValueModelTest {
 
@@ -79,7 +79,7 @@ public class AutoValueModelTest {
             .get().first().get(PersonType.ID);
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException {
         CommonDataSource dataSource = DatabaseType.getDataSource(new SQLite());
         EntityModel model = Models.AUTOVALUE;
@@ -97,7 +97,7 @@ public class AutoValueModelTest {
         tables.createTables(mode);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         if (data != null) {
             data.close();

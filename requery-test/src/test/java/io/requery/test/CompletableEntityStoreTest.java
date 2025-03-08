@@ -33,9 +33,9 @@ import io.requery.sql.platform.HSQL;
 import io.requery.test.model.Person;
 import io.requery.test.model.Phone;
 import io.requery.util.function.Supplier;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.sql.CommonDataSource;
 import java.sql.SQLException;
@@ -50,9 +50,9 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CompletableEntityStoreTest extends RandomData {
 
@@ -64,7 +64,7 @@ public class CompletableEntityStoreTest extends RandomData {
         ROLLBACK,
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException {
         Platform platform = new HSQL();
         CommonDataSource dataSource = DatabaseType.getDataSource(platform);
@@ -121,7 +121,7 @@ public class CompletableEntityStoreTest extends RandomData {
         tables.createTables(TableCreationMode.DROP_CREATE);
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         if (data != null) {
             data.close();

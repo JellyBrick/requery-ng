@@ -33,8 +33,8 @@ import io.requery.test.model3.LocationEntity;
 import io.requery.test.model3.Models;
 import io.requery.test.model3.Place;
 import io.requery.test.model3.Tag;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.sql.CommonDataSource;
 import java.io.IOException;
@@ -43,13 +43,13 @@ import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class JacksonTest {
 
     private EntityDataStore<Persistable> data;
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException {
         CommonDataSource dataSource = DatabaseType.getDataSource(new SQLite());
         EntityModel model = Models.MODEL3;

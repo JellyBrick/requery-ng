@@ -22,10 +22,10 @@ import io.requery.sql.KotlinEntityDataStore
 import io.requery.sql.SchemaModifier
 import io.requery.sql.TableCreationMode
 import org.h2.jdbcx.JdbcDataSource
-import org.junit.After
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.net.URL
 import java.util.*
 
@@ -42,7 +42,7 @@ class FunctionalTest {
             val lastNames = arrayOf("Smith", "Lee", "Jones")
             person.name = (firstNames[random.nextInt(firstNames.size)] + " " +
                     lastNames[random.nextInt(lastNames.size)])
-            person.email = (person.name.replace(" ".toRegex(), "").toLowerCase() + "@example.com")
+            person.email = (person.name.replace(" ".toRegex(), "").lowercase() + "@example.com")
             person.uuid = (UUID.randomUUID())
             person.homepage = (URL("http://www.requery.io"))
             val calendar = Calendar.getInstance()
@@ -52,7 +52,7 @@ class FunctionalTest {
         }
     }
 
-    @Before
+    @BeforeEach
     fun setup() {
         val model = Models.KT
         val dataSource = JdbcDataSource()
@@ -78,7 +78,7 @@ class FunctionalTest {
         data.invoke {
             insert(person)
             assertTrue(person.id > 0)
-            val result = select(Person::class) where (Person::id eq person.id) limit 10
+            val result = select(Person::class) where (Person::id.eq<Person, Int>(person.id)) limit 10
             assertSame(result().first(), person)
         }
     }
@@ -133,9 +133,9 @@ class FunctionalTest {
         data.insert(person3)
         val result = data select Person::class where (
                         (Person::age gt 5)
-                        and (Person::age lt 75)
-                        and (Person::name ne "Bob" )
-                        or (Person::name eq "Bob") )
+                        and (Person::age.lt<Person, Int>(75))
+                        and (Person::name.ne<Person, String>("Bob"))
+                        or (Person::name.eq<Person, String>("Bob")))
         val list = result.get().toList()
         assertTrue(list.contains(person2))
         assertTrue(list.contains(person3))
@@ -151,8 +151,8 @@ class FunctionalTest {
         data.insert(person)
         // not a useful query just tests the sql output
         val result = data.select(Address::class)
-                .join(Person::class).on(Person::address.eq(Person::id))
-                .where(Person::id.eq(person.id))
+                .join(Person::class).on(Person::address.eq<Person, Any, Person>(Person::id))
+                .where(Person::id.eq<Person, Int>(person.id))
                 .orderBy(Address::city.desc())
                 .get()
         assertTrue(result.toList().size > 0)
@@ -175,11 +175,11 @@ class FunctionalTest {
         val rowCount = data.update<Person>(Person::class)
                 .set(Person::about, "nothing")
                 .set(Person::age, 50)
-                .where(Person::age.eq(100)).get().value()
+                .where(Person::age.eq<Person, Int>(100)).get().value()
         assertEquals(1, rowCount.toLong())
     }
 
-    @After
+    @AfterEach
     fun teardown() {
         data.close()
     }

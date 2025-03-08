@@ -13,7 +13,7 @@ java {
 dependencies {
     implementation(project(":requery"))
     implementation("jakarta.persistence:jakarta.persistence-api:${libs.versions.jpa.get()}")
-    implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
+    implementation("jakarta.annotation:jakarta.annotation-api:3.0.0")
     implementation("com.squareup:javapoet:1.11.1")
 }
 

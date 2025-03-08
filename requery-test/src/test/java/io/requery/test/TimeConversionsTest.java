@@ -28,9 +28,9 @@ import io.requery.sql.platform.HSQL;
 import io.requery.sql.Platform;
 import io.requery.test.model2.Event;
 import io.requery.test.model2.Models;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import javax.sql.CommonDataSource;
 import java.sql.SQLException;
@@ -43,11 +43,13 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class TimeConversionsTest {
 
     protected EntityDataStore<Persistable> data;
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException {
         Platform platform = new HSQL();
         CommonDataSource dataSource = DatabaseType.getDataSource(platform);
@@ -75,7 +77,7 @@ public class TimeConversionsTest {
         data.insert(event);
 
         event = data.findByKey(Event.class, id);
-        Assert.assertEquals(localDateNow, event.getLocalDate());
+        assertEquals(localDateNow, event.getLocalDate());
     }
 
     @Test
@@ -87,7 +89,7 @@ public class TimeConversionsTest {
         event.setLocalTime(localTimeNow);
         data.insert(event);
         event = data.findByKey(Event.class, id);
-        Assert.assertEquals(localTimeNow.withNano(0), event.getLocalTime());
+        assertEquals(localTimeNow.withNano(0), event.getLocalTime());
     }
 
     @Test
@@ -105,8 +107,8 @@ public class TimeConversionsTest {
         data.insert(event);
 
         event = data.findByKey(Event.class, id);
-        Assert.assertEquals(localDateTimeNow, event.getLocalDateTime());
-        Assert.assertEquals(offsetDateTimeNow, event.getOffsetDateTime());
-        Assert.assertEquals(zonedDateTimeNow.toInstant(), event.getZonedDateTime().toInstant());
+        assertEquals(localDateTimeNow, event.getLocalDateTime());
+        assertEquals(offsetDateTimeNow, event.getOffsetDateTime());
+        assertEquals(zonedDateTimeNow.toInstant(), event.getZonedDateTime().toInstant());
     }
 }

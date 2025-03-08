@@ -1,15 +1,16 @@
 package io.requery.test;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import io.requery.proxy.CollectionChanges;
 import io.requery.test.model.Person;
@@ -18,17 +19,21 @@ import io.requery.util.ObservableCollection;
 import io.requery.util.ObservableList;
 import io.requery.util.ObservableSet;
 
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by mluchi on 25/05/2017.
  */
-@RunWith(Parameterized.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ObservableCollectionTest<T extends Collection<Phone> & ObservableCollection<Phone>> {
 
-    @Parameterized.Parameters
-    public static <T extends Collection<Phone> & ObservableCollection<Phone>> Collection<T> observableCollections() {
+    private T observableCollection;
+    private Phone phone1;
+    private Phone phone2;
+    private CollectionChanges collectionChanges;
+
+    static <T extends Collection<Phone> & ObservableCollection<Phone>> Stream<T> observableCollections() {
         Person person = new Person();
 
         // ObservableList
@@ -39,20 +44,21 @@ public class ObservableCollectionTest<T extends Collection<Phone> & ObservableCo
         Set<Phone> observableSet = person.getPhoneNumbersSet();
         assertTrue(observableSet instanceof ObservableSet);
 
-        return Arrays.asList((T) observableList, (T) observableSet);
+        return Arrays.asList((T) observableList, (T) observableSet).stream();
     }
 
-    private T observableCollection;
-    private Phone phone1;
-    private Phone phone2;
-    private CollectionChanges collectionChanges;
+    public ObservableCollectionTest() {
+    }
 
-    public ObservableCollectionTest(T observableCollection) {
+    void init(T observableCollection) {
         this.observableCollection = observableCollection;
+        setUp();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
+        if (observableCollection == null) return;
+
         // Populate the collection with 2 items
         observableCollection.clear();
         phone1 = new Phone();
@@ -73,8 +79,11 @@ public class ObservableCollectionTest<T extends Collection<Phone> & ObservableCo
     /**
      * Tests for issue https://github.com/requery/requery/issues/569
      */
-    @Test
-    public void testClear() {
+    @ParameterizedTest
+    @MethodSource("observableCollections")
+    public void testClear(T collection) {
+        init(collection);
+
         // Add an element to the collection, then clear the collection
         Phone phone3 = new Phone();
         phone3.setPhoneNumber("3");
@@ -92,10 +101,13 @@ public class ObservableCollectionTest<T extends Collection<Phone> & ObservableCo
     /**
      * Tests for issue https://github.com/requery/requery/issues/569
      */
-    @Test
-    public void testRemoveUsingIterator() {
+    @ParameterizedTest
+    @MethodSource("observableCollections")
+    public void testRemoveUsingIterator(T collection) {
+        init(collection);
+
         // Remove all items using iterator
-        Iterator iterator = observableCollection.iterator();
+        Iterator<Phone> iterator = observableCollection.iterator();
         while (iterator.hasNext()) {
             iterator.next();
             iterator.remove();
@@ -107,5 +119,4 @@ public class ObservableCollectionTest<T extends Collection<Phone> & ObservableCo
         assertTrue(collectionChanges.removedElements().contains(phone1));
         assertTrue(collectionChanges.removedElements().contains(phone2));
     }
-
 }

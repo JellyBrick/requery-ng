@@ -29,10 +29,9 @@ import io.requery.sql.TableCreationMode;
 import io.requery.sql.platform.HSQL;
 import io.requery.test.model.Person;
 import io.requery.test.model.Phone;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import reactor.core.publisher.Flux;
@@ -51,15 +50,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ReactorTest extends RandomData {
 
     protected ReactorEntityStore<Persistable> data;
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException {
         Platform platform = new HSQL();
         CommonDataSource dataSource = DatabaseType.getDataSource(platform);
@@ -82,7 +79,7 @@ public class ReactorTest extends RandomData {
         data = new ReactorEntityStore<>(new EntityDataStore<Persistable>(configuration));
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         if (data != null) {
             data.close();
@@ -141,12 +138,12 @@ public class ReactorTest extends RandomData {
                 .subscribe(new Consumer<Person>() {
             @Override
             public void accept(Person person) {
-                Assert.fail();
+                fail();
             }
         }, new Consumer<Throwable>() {
             @Override
             public void accept(Throwable throwable) {
-                Assert.fail();
+                fail();
             }
         }, new Runnable() {
             @Override
@@ -155,7 +152,7 @@ public class ReactorTest extends RandomData {
             }
         });
         if (!latch.await(1, TimeUnit.SECONDS)) {
-            Assert.fail();
+            fail();
         }
     }
 

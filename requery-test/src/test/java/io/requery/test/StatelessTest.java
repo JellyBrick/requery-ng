@@ -29,27 +29,23 @@ import io.requery.sql.platform.H2;
 import io.requery.sql.platform.SQLite;
 import io.requery.test.stateless.Entry;
 import io.requery.test.stateless.Models;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import javax.sql.CommonDataSource;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(Parameterized.class)
-public class StatelessTest {
+class StatelessTest {
 
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Platform> data() {
-        return Arrays.<Platform>asList(new H2(), new SQLite());
+    static Stream<Platform> data() {
+        return Stream.of(new H2(), new SQLite());
     }
 
     private EntityDataStore<Persistable> data;
@@ -59,16 +55,16 @@ public class StatelessTest {
         this.platform = platform;
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException {
         CommonDataSource dataSource = DatabaseType.getDataSource(platform);
         EntityModel model = Models.STATELESS;
 
         Configuration configuration = new ConfigurationBuilder(dataSource, model)
-            .useDefaultLogging()
-            .setEntityCache(new EmptyEntityCache())
-            .setWriteExecutor(Executors.newSingleThreadExecutor())
-            .build();
+                .useDefaultLogging()
+                .setEntityCache(new EmptyEntityCache())
+                .setWriteExecutor(Executors.newSingleThreadExecutor())
+                .build();
 
         SchemaModifier tables = new SchemaModifier(configuration);
         tables.createTables(TableCreationMode.DROP_CREATE);
@@ -76,8 +72,11 @@ public class StatelessTest {
         data = new EntityDataStore<>(configuration);
     }
 
-    @Test
-    public void testInsert() {
+    @ParameterizedTest
+    @MethodSource("data")
+    void testInsert(Platform platform) throws SQLException {
+        this.platform = platform;
+        setup();
         Entry event = new Entry();
         UUID id = UUID.randomUUID();
         event.setId(id.toString());
@@ -90,8 +89,11 @@ public class StatelessTest {
         assertEquals(event.getId(), found.getId());
     }
 
-    @Test
-    public void testUpdate() {
+    @ParameterizedTest
+    @MethodSource("data")
+    void testUpdate(Platform platform) throws SQLException {
+        this.platform = platform;
+        setup();
         Entry event = new Entry();
         UUID id = UUID.randomUUID();
         event.setId(id.toString());
@@ -101,15 +103,15 @@ public class StatelessTest {
 
         data.insert(event);
         Entry found = data.findByKey(Entry.class, id.toString());
-        assertEquals(found.isFlag1(), false);
-        assertEquals(found.isFlag2(), true);
+        assertEquals(false, found.isFlag1());
+        assertEquals(true, found.isFlag2());
 
         event.setFlag1(true);
         event.setFlag2(false);
         data.update(event);
 
         found = data.findByKey(Entry.class, id.toString());
-        assertEquals(found.isFlag1(), true);
-        assertEquals(found.isFlag2(), false);
+        assertEquals(true, found.isFlag1());
+        assertEquals(false, found.isFlag2());
     }
 }

@@ -18,21 +18,21 @@ package io.requery.test.kt
 
 import io.requery.async.KotlinCompletableEntityStore
 import io.requery.kotlin.eq
+import io.requery.query.Condition
 import io.requery.query.Result
 import io.requery.sql.KotlinConfiguration
 import io.requery.sql.KotlinEntityDataStore
 import io.requery.sql.SchemaModifier
 import io.requery.sql.TableCreationMode
 import org.h2.jdbcx.JdbcDataSource
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.sql.SQLException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.properties.Delegates
 
 class CompletableTest {
 
@@ -44,7 +44,7 @@ class CompletableTest {
         return FunctionalTest.randomPerson()
     }
 
-    @Before
+    @BeforeEach
     @Throws(SQLException::class)
     fun setup() {
         val model = Models.KT
@@ -65,7 +65,7 @@ class CompletableTest {
         tables.createTables(mode)
     }
 
-    @After
+    @AfterEach
     fun teardown() {
         data.close()
     }
@@ -76,7 +76,7 @@ class CompletableTest {
         val personId = instance.insert(person).id
 
         data.select(Person::class)
-                .where(Person::id.eq(personId))
+                .where(Person::id.eq<Person, Int>(personId))
                 .get()
                 .toCompletableFuture(Result<Person>::firstOrNull)
                 .get()
@@ -92,7 +92,7 @@ class CompletableTest {
 
         data.execute {
             data.select(Person::class)
-                    .where(Person::id.eq(personId))
+                    .where(Person::id.eq<Person, Int>(personId))
                     .get()
                     .firstOrNull()
         }

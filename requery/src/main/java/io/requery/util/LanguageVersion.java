@@ -60,7 +60,7 @@ public enum LanguageVersion {
                     version = JAVA_1_8;
             }
         } catch (SecurityException se) {
-            version = JAVA_1_7; // lowest supported
+            version = JAVA_1_8; // lowest supported
         }
     }
 

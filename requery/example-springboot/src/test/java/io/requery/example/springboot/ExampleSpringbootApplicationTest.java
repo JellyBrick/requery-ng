@@ -2,8 +2,8 @@ package io.requery.example.springboot;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.requery.example.springboot.entity.User;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,8 +28,7 @@ public class ExampleSpringbootApplicationTest {
     private User testUser;
     private ObjectMapper objectMapper;
 
-    @Before
-    public void setUp() {
+    @BeforeEach    public void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
         objectMapper = new ObjectMapper();
         testUser = new User("John", "Smith");

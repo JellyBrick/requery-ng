@@ -9,7 +9,7 @@ import io.requery.sql.TableCreationMode;
 import io.requery.sql.platform.H2;
 import io.requery.test.model.Models;
 import io.requery.test.model.Person;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Mode;

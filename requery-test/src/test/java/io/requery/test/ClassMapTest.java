@@ -1,8 +1,11 @@
 package io.requery.test;
 
 import io.requery.util.ClassMap;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ClassMapTest {
 
@@ -10,8 +13,8 @@ public class ClassMapTest {
     public void testDerivedContains() {
         ClassMap<String> map = new ClassMap<>();
         map.put(CharSequence.class, "test");
-        Assert.assertTrue(map.containsKey(String.class));
-        Assert.assertEquals(map.get(String.class), "test");
-        Assert.assertNull(map.get(Object.class));
+        assertTrue(map.containsKey(String.class));
+        assertEquals(map.get(String.class), "test");
+        assertNull(map.get(Object.class));
     }
 }

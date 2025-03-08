@@ -17,9 +17,10 @@ import io.requery.sql.platform.PostgresSQL;
 import io.requery.sql.platform.SQLServer;
 import io.requery.sql.platform.SQLite;
 import io.requery.test.model.Models;
-import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import javax.cache.CacheManager;
 import javax.cache.Caching;
@@ -28,16 +29,17 @@ import javax.sql.CommonDataSource;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * Runs the functional tests against several different databases.
  *
  * @author Nikhil Purushe
  */
-@RunWith(Parameterized.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ParameterizedFunctionalTest extends FunctionalTest {
 
-    private static Collection<Platform> CI = Arrays.<Platform>asList(
+    private static Collection<Platform> CI = Arrays.asList(
         new PostgresSQL(),
         new MySQL(),
         new H2(),
@@ -45,7 +47,7 @@ public class ParameterizedFunctionalTest extends FunctionalTest {
         new Derby(),
         new SQLite());
 
-    private static Collection<Platform> ALL = Arrays.<Platform>asList(
+    private static Collection<Platform> ALL = Arrays.asList(
         new Oracle(),
         new SQLServer(),
         new MySQL(),
@@ -55,19 +57,20 @@ public class ParameterizedFunctionalTest extends FunctionalTest {
         new H2(),
         new HSQL());
 
-    @Parameterized.Parameters(name = "{0}")
-    public static Collection<Platform> data() {
-        return CI; // ALL;
+    static Stream<Platform> platforms() {
+        return CI.stream(); // ALL.stream();
     }
 
     private Platform platform;
 
-    public ParameterizedFunctionalTest(Platform platform) {
+    void initPlatform(Platform platform) {
         this.platform = platform;
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws SQLException {
+        if (platform == null) return;
+
         CommonDataSource dataSource = DatabaseType.getDataSource(platform);
         EntityModel model = Models.DEFAULT;
 

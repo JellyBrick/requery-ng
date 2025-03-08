@@ -1,14 +1,14 @@
 package io.requery.test;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import io.requery.proxy.CollectionChanges;
 import io.requery.test.model.Person;
 import io.requery.test.model.Phone;
 import io.requery.util.ObservableList;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by mluchi on 23/05/2017.
@@ -25,7 +25,7 @@ public class CollectionChangesTest {
     private ObservableList observableList;
     private CollectionChanges collectionChanges;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         // Create some mock objects (Person has a to-many relationship to Phone)
         phone1 = new Phone();

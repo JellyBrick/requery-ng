@@ -52,9 +52,9 @@ import io.requery.test.model.ParentNoCascade;
 import io.requery.test.model.Person;
 import io.requery.test.model.Phone;
 import io.requery.util.function.Consumer;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -77,13 +77,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static io.requery.query.Unary.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * The idea here is to create a set of entity models using as many different features of the
@@ -98,10 +92,10 @@ public abstract class FunctionalTest extends RandomData {
 
     protected EntityDataStore<Persistable> data;
 
-    @Before
+    @BeforeEach
     public abstract void setup() throws SQLException;
 
-    @After
+    @AfterEach
     public void teardown() {
         if (data != null) {
             data.close();
@@ -1570,7 +1564,7 @@ public abstract class FunctionalTest extends RandomData {
         assertTrue(result.get(1).get("groupName").equals("Hello!"));
     }
 
-    @Test(expected = PersistenceException.class)
+    @Test
     public void testViolateUniqueConstraint() {
         UUID uuid = UUID.randomUUID();
         Person p1 = randomPerson();
@@ -1578,22 +1572,25 @@ public abstract class FunctionalTest extends RandomData {
         data.insert(p1);
         Person p2 = randomPerson();
         p2.setUUID(uuid);
-        data.insert(p2);
+        assertThrows(PersistenceException.class, () -> data.insert(p2));
         fail();
     }
 
-    @Test(expected = PersistenceException.class)
+    @Test
     public void testInsertWithoutCascadeActionSave() {
         Child child = new Child();
         child.setId(1);
         Parent parent = new Parent();
         parent.setChild(child);
 
-        // This violates the Foreign Key Constraint, because Child does not exist and CascadeAction.SAVE is not specified
-        data.insert(parent);
+        assertThrows(
+                PersistenceException.class,
+                // This violates the Foreign Key Constraint, because Child does not exist and CascadeAction.SAVE is not specified
+                () -> data.insert(parent)
+        );
     }
 
-    @Test(expected = StatementExecutionException.class)
+    @Test
     public void testInsertNoCascade_OneToOne_NonExistingChild() {
         // Insert parent entity, associated one-to-one to a non existing child entity
         // This should fail with a foreign-key violation, since child does not exist in the database
@@ -1601,7 +1598,11 @@ public abstract class FunctionalTest extends RandomData {
         ParentNoCascade parent = new ParentNoCascade();
         parent.setId(1);
         parent.setOneToOne(child);
-        data.insert(parent);
+
+        assertThrows(
+                StatementExecutionException.class,
+                () -> data.insert(parent)
+        );
     }
 
     @Test
@@ -1621,7 +1622,7 @@ public abstract class FunctionalTest extends RandomData {
         assertEquals(child, parentGot.getOneToOne());
     }
 
-    @Test(expected = StatementExecutionException.class)
+    @Test
     public void testInsertNoCascade_ManyToOne_NonExistingchild() {
         // Insert parent entity, associated many-to-one to a non existing child entity
         // This should fail with a foreign-key violation, since child does not exist in the database
@@ -1631,7 +1632,11 @@ public abstract class FunctionalTest extends RandomData {
         ParentNoCascade parent = new ParentNoCascade();
         parent.setId(1);
         parent.setManyToOne(child);
-        data.insert(parent);
+
+        assertThrows(
+                StatementExecutionException.class,
+                () -> data.insert(parent)
+        );
     }
 
     @Test
@@ -1652,7 +1657,7 @@ public abstract class FunctionalTest extends RandomData {
     }
 
     //@Test(expected = StatementExecutionException.class)
-    @Test(expected = RowCountException.class)
+    @Test
     public void testInsertNoCascade_OneToMany_NonExistingChild() {
         // Insert parent entity, associated one-to-may to 1 non-existing child entity
         ChildOneToManyNoCascade child = new ChildOneToManyNoCascade();
@@ -1661,7 +1666,11 @@ public abstract class FunctionalTest extends RandomData {
         ParentNoCascade parent = new ParentNoCascade();
         parent.setId(1);
         parent.getOneToMany().add(child);
-        data.insert(parent);
+
+        assertThrows(
+                RowCountException.class,
+                () -> data.insert(parent)
+        );
     }
 
     @Test
@@ -1682,7 +1691,7 @@ public abstract class FunctionalTest extends RandomData {
         assertEquals(child, parentGot.getOneToMany().get(0));
     }
 
-    @Test(expected = StatementExecutionException.class)
+    @Test
     public void testInsertNoCascade_ManyToMany_NonExistingChild() {
         // Insert parent entity, associated many-to-may to 1 non-existing child entity
         ChildManyToManyNoCascade child = new ChildManyToManyNoCascade();
@@ -1691,7 +1700,10 @@ public abstract class FunctionalTest extends RandomData {
         ParentNoCascade parent = new ParentNoCascade();
         parent.setId(1);
         parent.getManyToMany().add(child);
-        data.insert(parent);
+        assertThrows(
+                StatementExecutionException.class,
+                () -> data.insert(parent)
+        );
     }
 
     @Test
