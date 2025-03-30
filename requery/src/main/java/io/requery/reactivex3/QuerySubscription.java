@@ -72,7 +72,8 @@ public class QuerySubscription<T> implements Subscription {
         // emitting with limit/offset
         long count = n;
         while (count > 0) {
-            try (CloseableIterator<T> iterator = result.iterator(emitted.intValue(), (int) n)) {
+            int limit = (n > Integer.MAX_VALUE) ? Integer.MAX_VALUE : (int) n;
+            try (CloseableIterator<T> iterator = result.iterator(emitted.intValue(), limit)) {
                 long i = 0;
                 while (!canceled.get() && iterator.hasNext()) {
                     if (i++ < count) {
