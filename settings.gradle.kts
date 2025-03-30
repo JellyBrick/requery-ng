@@ -1,6 +1,7 @@
 rootProject.name = "requery-persistence"
 include(":requery")
 include(":requery-processor")
+include(":requery-processor-ksp")
 include(":requery-test")
 include(":requery-android")
 include(":requery-android:example")

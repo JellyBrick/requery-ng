@@ -3,6 +3,8 @@ import java.util.Properties
 plugins {
     java
     `maven-publish`
+    kotlin("jvm") version libs.versions.kotlin.get() apply false
+    id("com.google.devtools.ksp") version libs.versions.ksp.get() apply false
 }
 
 buildscript {
@@ -23,6 +25,19 @@ allprojects {
         google()
         mavenCentral()
     }
+    
+    tasks.withType<JavaCompile>().configureEach {
+        options.release.set(11)
+    }
+    
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions {
+            jvmTarget = "11"
+            languageVersion = "2.0"
+            apiVersion = "2.0"
+            freeCompilerArgs = listOf("-Xjsr305=strict")
+        }
+    }
 }
 
 group = "io.requery"
@@ -38,6 +53,7 @@ if (localProperties.exists()) {
 configure(listOf(
         project(":requery"),
         project(":requery-processor"),
+        project(":requery-processor-ksp"),
         project(":requery-kotlin"),
         project(":requery-jackson")
 )) {
@@ -45,7 +61,7 @@ configure(listOf(
     apply(plugin = "maven-publish")
 
     tasks.withType<Javadoc>().configureEach {
-        (options as StandardJavadocDocletOptions).links("http://docs.oracle.com/javase/8/docs/api/")
+        (options as StandardJavadocDocletOptions).links("http://docs.oracle.com/javase/11/docs/api/")
     }
 
     val sourcesJar by tasks.registering(Jar::class) {

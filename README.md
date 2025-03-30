@@ -1,7 +1,7 @@
 ![requery](http://requery.github.io/logo.png)
 
-A light but powerful object mapping and SQL generator for Java/Kotlin/Android with RxJava and Java 8 support.
-Easily map to or create databases, perform queries and updates from any platform that uses Java.
+A light but powerful object mapping and SQL generator for Java/Kotlin/Android with RxJava, Kotlin Coroutines, and Java 9+ support.
+Easily map to or create databases, perform queries and updates from any platform that uses Java or Kotlin.
 
 [![Build Status](https://travis-ci.org/requery/requery.svg?branch=master)](https://travis-ci.org/requery/requery)
 [![Download](https://api.bintray.com/packages/requery/requery/requery/images/download.svg)](https://bintray.com/requery/requery/requery/_latestVersion)
@@ -114,9 +114,43 @@ abstract class AbstractPerson {
 **[Kotlin](https://github.com/requery/requery/wiki/Kotlin) specific support using property references and infix functions:**
 
 ```kotlin
+// Kotlin 1.x style
 data {
     val result = select(Person::class) where (Person::age gt 21) and (Person::name eq "Bob") limit 10
 }
+
+// Enhanced Kotlin 2.x style with improved DSL
+query {
+    select<Person>() where (Person::age isGreaterThan 21) and (Person::name isEqualTo "Bob") orderBy Person::name.asc()
+}
+```
+
+**Kotlin Coroutines and Flow:**
+
+```kotlin
+// Suspending functions for non-blocking database operations
+val coroutineStore = store.asCoroutineEntityStore()
+
+// Find by key with suspending function
+val person = coroutineStore.findByKeyAsync<Person>(123)
+
+// Transaction with coroutines
+coroutineStore.withTransaction {
+    val person = insertAsync(Person {
+        name = "John"
+        age = 30
+    })
+    refreshAsync(person)
+}
+
+// Flow API for reactive queries
+coroutineStore.select<Person>()
+    .where(Person::age.gt(21))
+    .get()
+    .asFlow()
+    .collect { person ->
+        println("Person: ${person.name}")
+    }
 ```
 
 **Java 8 [streams](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html):**
@@ -176,9 +210,13 @@ Features
 
 - No Reflection
 - Fast startup & performance
-- No dependencies (RxJava is optional)
+- No dependencies (RxJava and Coroutines are optional)
 - Typed query language
 - Table generation
+- Java 9+ module system support
+- Kotlin 2.0 support with enhanced DSL
+- Kotlin Coroutines and Flow support
+- KSP annotation processing
 - Supports JDBC and most popular databases (MySQL, Oracle, SQL Server, Postgres and more)
 - Supports Android (SQLite, RecyclerView, Databinding, SQLCipher)
 - Blocking and non-blocking API
@@ -264,21 +302,47 @@ Upserts are generated with the appropriate database specific query statements:
 Using it
 --------
 
-Versions are available on bintray jcenter / maven central.
+Versions are available on Maven Central.
 
 ```gradle
 repositories {
-    jcenter()
+    mavenCentral()
+}
+
+// Java
+dependencies {
+    implementation 'io.requery:requery:1.6.1'
+    implementation 'io.requery:requery-android:1.6.1' // for android
+    annotationProcessor 'io.requery:requery-processor:1.6.1'
+}
+
+// Kotlin with KAPT
+dependencies {
+    implementation 'io.requery:requery:1.6.1'
+    implementation 'io.requery:requery-kotlin:1.6.1'
+    implementation 'io.requery:requery-android:1.6.1' // for android
+    kapt 'io.requery:requery-processor:1.6.1'
+}
+
+// Kotlin with KSP (recommended for Kotlin 2.0+)
+plugins {
+    id 'com.google.devtools.ksp' version '2.0.0-1.0.19'
 }
 
 dependencies {
-    compile 'io.requery:requery:1.6.1'
-    compile 'io.requery:requery-android:1.6.1' // for android
-    annotationProcessor 'io.requery:requery-processor:1.6.1'
+    implementation 'io.requery:requery:1.6.1'
+    implementation 'io.requery:requery-kotlin:1.6.1'
+    implementation 'io.requery:requery-android:1.6.1' // for android
+    ksp 'io.requery:requery-processor-ksp:1.6.1'
+}
+
+// For Kotlin Coroutines support
+dependencies {
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0'
 }
 ```
 
-For information on gradle and annotation processing & gradle see the [wiki](https://github.com/requery/requery/wiki/Gradle-&-Annotation-processing#annotation-processing).
+For information on gradle and annotation processing see the [wiki](https://github.com/requery/requery/wiki/Gradle-&-Annotation-processing#annotation-processing).
 
 License
 -------
