@@ -166,6 +166,7 @@ class ConnectionTransaction implements EntityTransaction, ConnectionProvider {
             throw new TransactionException(e);
         } finally {
             resetConnection();
+            close();
         }
     }
 
